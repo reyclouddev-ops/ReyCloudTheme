@@ -1,0 +1,108 @@
+body {
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(139,92,246,.10),
+            transparent 35%
+        ),
+        #0b0b12 !important;
+}
+
+nav,
+aside,
+header {
+    background:
+        rgba(12,12,20,.92) !important;
+
+    border-color:
+        rgba(255,255,255,.07) !important;
+
+    backdrop-filter: blur(18px);
+}
+
+button {
+    border-radius: 10px;
+}
+
+.bg-neutral-800,
+.bg-gray-800,
+.bg-gray-900,
+.bg-neutral-900 {
+    background-color:
+        rgba(18,18,28,.88) !important;
+}
+
+.border-neutral-700,
+.border-gray-700,
+.border-gray-800 {
+    border-color:
+        rgba(255,255,255,.07) !important;
+}
+
+.bg-primary-500,
+.bg-primary-600,
+.bg-blue-500,
+.bg-blue-600 {
+    background: linear-gradient(
+        135deg,
+        var(--rey-primary),
+        var(--rey-secondary)
+    ) !important;
+}
+
+.text-primary-400,
+.text-primary-500,
+.text-blue-400,
+.text-blue-500 {
+    color: #a78bfa !important;
+}
+
+.shadow-lg,
+.shadow-xl {
+    box-shadow:
+        0 20px 50px
+        rgba(0,0,0,.20) !important;
+}
+
+input,
+textarea,
+select {
+    background:
+        rgba(255,255,255,.035) !important;
+
+    border-color:
+        rgba(255,255,255,.08) !important;
+
+    color: #fff !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color:
+        var(--rey-primary) !important;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(139,92,246,.12) !important;
+}
+
+table {
+    background:
+        rgba(18,18,28,.70) !important;
+}
+
+tr {
+    border-color:
+        rgba(255,255,255,.06) !important;
+}
+
+.status-online,
+.text-green-400,
+.text-green-500 {
+    color: #4ade80 !important;
+}
+
+.bg-green-500 {
+    background-color: #22c55e !important;
+}
