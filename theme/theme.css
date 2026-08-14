@@ -1,0 +1,188 @@
+:root {
+    --rey-primary: #8b5cf6;
+    --rey-secondary: #6366f1;
+    --rey-bg: #07070b;
+    --rey-panel: #101018;
+    --rey-panel-2: #151521;
+    --rey-border: rgba(255,255,255,.08);
+    --rey-text: #f8fafc;
+    --rey-muted: #94a3b8;
+}
+
+html,
+body {
+    background:
+        radial-gradient(
+            circle at 15% 0%,
+            rgba(139,92,246,.14),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 100% 20%,
+            rgba(99,102,241,.12),
+            transparent 30%
+        ),
+        var(--rey-bg) !important;
+
+    color: var(--rey-text) !important;
+}
+
+/* SIDEBAR */
+
+nav,
+aside {
+    background:
+        rgba(10,10,16,.94) !important;
+
+    border-color:
+        var(--rey-border) !important;
+
+    backdrop-filter:
+        blur(18px);
+}
+
+/* CARDS */
+
+.rounded,
+.rounded-lg,
+.rounded-xl {
+    border-color:
+        var(--rey-border) !important;
+}
+
+.bg-gray-800,
+.bg-gray-900,
+.bg-neutral-800,
+.bg-neutral-900 {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.045),
+            rgba(255,255,255,.018)
+        ) !important;
+}
+
+/* INPUT */
+
+input,
+textarea,
+select {
+    background:
+        rgba(255,255,255,.035) !important;
+
+    color:
+        var(--rey-text) !important;
+
+    border:
+        1px solid var(--rey-border) !important;
+
+    border-radius:
+        11px !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color:
+        var(--rey-primary) !important;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(139,92,246,.12) !important;
+
+    outline:
+        none !important;
+}
+
+/* BUTTON */
+
+button,
+.btn {
+    border-radius:
+        10px !important;
+}
+
+.bg-blue-500,
+.bg-primary-500 {
+    background:
+        linear-gradient(
+            135deg,
+            var(--rey-primary),
+            var(--rey-secondary)
+        ) !important;
+}
+
+/* LINKS */
+
+a {
+    transition:
+        all .2s ease;
+}
+
+a:hover {
+    color:
+        #a78bfa !important;
+}
+
+/* TEXT */
+
+.text-gray-300,
+.text-gray-400,
+.text-neutral-400,
+.text-neutral-500 {
+    color:
+        var(--rey-muted) !important;
+}
+
+/* LOGIN */
+
+form {
+    border-radius:
+        18px !important;
+}
+
+.login-container,
+[class*="login"] {
+    transition:
+        .25s ease;
+}
+
+/* STATUS */
+
+.text-green-500,
+.text-green-400 {
+    color:
+        #34d399 !important;
+}
+
+/* SCROLLBAR */
+
+::-webkit-scrollbar {
+    width:
+        7px;
+    height:
+        7px;
+}
+
+::-webkit-scrollbar-track {
+    background:
+        transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background:
+        linear-gradient(
+            var(--rey-primary),
+            var(--rey-secondary)
+        );
+
+    border-radius:
+        20px;
+}
+
+/* SELECTION */
+
+::selection {
+    background:
+        rgba(139,92,246,.35);
+}
