@@ -1,0 +1,93 @@
+.login-container {
+    min-height: 100vh !important;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(139,92,246,.20),
+            transparent 40%
+        ),
+        #09090f !important;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container form,
+.login-box,
+.login-container > div {
+    background: rgba(18,18,28,.90) !important;
+
+    border: 1px solid
+        rgba(255,255,255,.08) !important;
+
+    border-radius: 20px !important;
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.45) !important;
+
+    backdrop-filter: blur(20px);
+}
+
+.login-container input {
+    background: rgba(255,255,255,.04) !important;
+
+    border: 1px solid
+        rgba(255,255,255,.08) !important;
+
+    color: #fff !important;
+
+    min-height: 46px;
+}
+
+.login-container input:focus {
+    border-color:
+        var(--rey-primary) !important;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(139,92,246,.15) !important;
+}
+
+.login-container button[type="submit"] {
+    background: linear-gradient(
+        135deg,
+        var(--rey-primary),
+        var(--rey-secondary)
+    ) !important;
+
+    border: none !important;
+
+    border-radius: 10px !important;
+
+    min-height: 46px;
+
+    font-weight: 700;
+
+    color: white !important;
+
+    box-shadow:
+        0 10px 30px
+        rgba(99,102,241,.25);
+}
+
+.login-container button[type="submit"]:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 15px 35px
+        rgba(99,102,241,.35);
+}
+
+.login-container label {
+    color: #cbd5e1 !important;
+}
+
+.login-container a {
+    color: #a78bfa !important;
+}
+
+.login-container a:hover {
+    color: #c4b5fd !important;
+}
