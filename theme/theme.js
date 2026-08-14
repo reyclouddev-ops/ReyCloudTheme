@@ -2,37 +2,58 @@
     "use strict";
 
     const BRAND = "ReyCloud";
+    const THEME_ID = "reycloud-theme";
+
+    function replaceBrandText(root = document.body) {
+        if (!root) return;
+
+        const walker = document.createTreeWalker(
+            root,
+            NodeFilter.SHOW_TEXT
+        );
+
+        const nodes = [];
+
+        while (walker.nextNode()) {
+            nodes.push(walker.currentNode);
+        }
+
+        for (const node of nodes) {
+            if (
+                !node.nodeValue ||
+                !/Pterodactyl/i.test(node.nodeValue)
+            ) {
+                continue;
+            }
+
+            node.nodeValue =
+                node.nodeValue.replace(
+                    /Pterodactyl/gi,
+                    BRAND
+                );
+        }
+    }
 
     function applyBrand() {
         document.documentElement.dataset.reycloud = "true";
 
-        if (document.title) {
-            document.title = document.title
-                .replace(/Pterodactyl/gi, BRAND);
+        if (
+            document.title &&
+            /Pterodactyl/i.test(document.title)
+        ) {
+            document.title =
+                document.title.replace(
+                    /Pterodactyl/gi,
+                    BRAND
+                );
         }
 
-        document
-            .querySelectorAll("a, span, div")
-            .forEach((element) => {
-                if (
-                    element.childNodes.length === 1 &&
-                    element.childNodes[0].nodeType === 3 &&
-                    /Pterodactyl/i.test(element.textContent)
-                ) {
-                    element.textContent =
-                        element.textContent.replace(
-                            /Pterodactyl/gi,
-                            BRAND
-                        );
-                }
-            });
+        replaceBrandText();
     }
 
-    function inject() {
+    function injectStylesheet() {
         if (
-            document.querySelector(
-                "#reycloud-theme"
-            )
+            document.getElementById(THEME_ID)
         ) {
             return;
         }
@@ -40,31 +61,36 @@
         const link =
             document.createElement("link");
 
-        link.id = "reycloud-theme";
+        link.id = THEME_ID;
         link.rel = "stylesheet";
-        link.href =
-            "/reycloud/theme.css";
+        link.href = "/reycloud/theme.css";
 
         document.head.appendChild(link);
+    }
 
+    function init() {
+        injectStylesheet();
         applyBrand();
     }
 
     if (
-        document.readyState ===
-        "loading"
+        document.readyState === "loading"
     ) {
         document.addEventListener(
             "DOMContentLoaded",
-            inject
+            init,
+            { once: true }
         );
     } else {
-        inject();
+        init();
     }
 
-    new MutationObserver(() => {
-        applyBrand();
-    }).observe(
+    const observer =
+        new MutationObserver(() => {
+            applyBrand();
+        });
+
+    observer.observe(
         document.documentElement,
         {
             childList: true,
