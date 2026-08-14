@@ -2,62 +2,45 @@
 
 set -e
 
-PTERO_DIR="/var/www/pterodactyl"
-BACKUP_DIR="/var/backups/reycloud-theme"
+PANEL="/var/www/pterodactyl"
+THEME_DIR="$PANEL/public/reycloud-theme"
 
 echo ""
-echo "========================================"
-echo "       REYCLOUD THEME UNINSTALL"
-echo "========================================"
+echo "=========================================="
+echo "      REYCLOUD THEME UNINSTALLER"
+echo "=========================================="
 echo ""
 
 if [ "$(id -u)" != "0" ]; then
-    echo "❌ Jalankan sebagai root."
+    echo "[ERROR] Jalankan sebagai root."
     exit 1
 fi
 
-echo "📦 Backup tersedia:"
-ls -1 "$BACKUP_DIR"/*.tar.gz 2>/dev/null || {
-    echo "❌ Backup tidak ditemukan."
+if [ ! -d "$PANEL" ]; then
+    echo "[ERROR] Pterodactyl tidak ditemukan."
     exit 1
-}
-
-LATEST=$(ls -t "$BACKUP_DIR"/*.tar.gz | head -n 1)
-
-echo ""
-echo "Backup terbaru:"
-echo "$LATEST"
-echo ""
-
-read -r -p "Restore backup ini? [y/N]: " CONFIRM
-
-if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
-    echo "❌ Dibatalkan."
-    exit 0
 fi
 
+echo "[1/4] Menghapus theme..."
+
+rm -rf "$THEME_DIR"
+
+echo "[2/4] Membersihkan cache..."
+
+cd "$PANEL"
+
+php artisan view:clear || true
+php artisan config:clear || true
+php artisan cache:clear || true
+
+echo "[3/4] Restart queue..."
+
+php artisan queue:restart 2>/dev/null || true
+
+echo "[4/4] Selesai."
+
 echo ""
-echo "♻️ Restore..."
-
-tar -xzf "$LATEST" -C "$PTERO_DIR"
-
-rm -rf "$PTERO_DIR/public/reycloud"
-
-cd "$PTERO_DIR"
-
-php artisan optimize:clear
-
-if command -v yarn >/dev/null 2>&1; then
-    yarn build:production || true
-fi
-
-systemctl restart nginx 2>/dev/null || true
-systemctl restart php8.3-fpm 2>/dev/null || true
-
-echo ""
-echo "========================================"
-echo "       REYCLOUD THEME REMOVED"
-echo "========================================"
-echo ""
-echo "✔ Backup telah direstore."
+echo "=========================================="
+echo "       THEME BERHASIL DIHAPUS"
+echo "=========================================="
 echo ""
