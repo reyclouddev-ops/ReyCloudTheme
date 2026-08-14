@@ -2,556 +2,261 @@
 
 set -e
 
-PTERO_DIR="/var/www/pterodactyl"
-THEME_DIR="$PTERO_DIR/public/reycloud"
+PANEL="/var/www/pterodactyl"
+THEME_DIR="$PANEL/public/reycloud-theme"
 BACKUP_DIR="/var/backups/reycloud-theme"
 
-PURPLE='\033[0;35m'
-CYAN='\033[0;36m'
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[1;33m'
-RESET='\033[0m'
+echo ""
+echo "=========================================="
+echo "        REYCLOUD PTERODACTYL THEME"
+echo "=========================================="
+echo ""
 
-clear
+if [ "$(id -u)" != "0" ]; then
+    echo "[ERROR] Jalankan sebagai root."
+    exit 1
+fi
 
-banner() {
-    echo -e "${PURPLE}"
-    echo "╔════════════════════════════════════════════╗"
-    echo "║          REYCLOUD PTERODACTYL THEME        ║"
-    echo "║                  v1.0.0                    ║"
-    echo "╚════════════════════════════════════════════╝"
-    echo -e "${RESET}"
-}
+if [ ! -d "$PANEL" ]; then
+    echo "[ERROR] Pterodactyl tidak ditemukan:"
+    echo "$PANEL"
+    exit 1
+fi
 
-success() {
-    echo -e "${GREEN}✔ $1${RESET}"
-}
+echo "[1/7] Mengecek Pterodactyl..."
 
-error() {
-    echo -e "${RED}✖ $1${RESET}"
-}
+if [ -f "$PANEL/artisan" ]; then
+    echo "[OK] Pterodactyl ditemukan."
+else
+    echo "[ERROR] File artisan tidak ditemukan."
+    exit 1
+fi
 
-info() {
-    echo -e "${CYAN}➜ $1${RESET}"
-}
+VERSION=$(grep -m1 '"version"' "$PANEL/composer.json" 2>/dev/null | sed -E 's/.*"version": *"([^"]+)".*/\1/')
 
-warning() {
-    echo -e "${YELLOW}⚠ $1${RESET}"
-}
+if [ -z "$VERSION" ]; then
+    VERSION="unknown"
+fi
 
-check_root() {
-    if [ "$(id -u)" != "0" ]; then
-        error "Script harus dijalankan sebagai root."
-        exit 1
-    fi
-}
+echo "[INFO] Version: $VERSION"
 
-check_pterodactyl() {
-    if [ ! -d "$PTERO_DIR" ]; then
-        error "Pterodactyl tidak ditemukan."
-        echo ""
-        echo "Path yang dicek:"
-        echo "$PTERO_DIR"
-        exit 1
-    fi
+echo "[2/7] Membuat backup..."
 
-    success "Pterodactyl ditemukan."
-}
+mkdir -p "$BACKUP_DIR"
 
-backup() {
-    mkdir -p "$BACKUP_DIR"
+BACKUP_FILE="$BACKUP_DIR/reycloud-$(date +%Y%m%d-%H%M%S).tar.gz"
 
-    local backup_file
-    backup_file="$BACKUP_DIR/reycloud-$(date +%Y%m%d-%H%M%S).tar.gz"
+tar -czf "$BACKUP_FILE" \
+    -C "$PANEL" \
+    resources/views \
+    public 2>/dev/null || true
 
-    info "Membuat backup..."
+echo "[OK] Backup:"
+echo "$BACKUP_FILE"
 
-    tar -czf "$backup_file" \
-        -C "$PTERO_DIR" \
-        resources public 2>/dev/null || true
+echo "[3/7] Membuat folder theme..."
 
-    success "Backup dibuat:"
-    echo "$backup_file"
-}
+mkdir -p "$THEME_DIR"
 
-install_theme() {
-    echo ""
-    info "Memulai instalasi ReyCloud Theme..."
-    echo ""
+echo "[4/7] Membuat CSS..."
 
-    backup
-
-    mkdir -p "$THEME_DIR"
-
-    cat > "$THEME_DIR/theme.css" <<'EOF'
+cat > "$THEME_DIR/theme.css" <<'EOF'
 :root {
     --rey-primary: #8b5cf6;
     --rey-secondary: #6366f1;
-    --rey-bg: #07070b;
-    --rey-panel: #101018;
-    --rey-panel-2: #151521;
+    --rey-bg: #0b0b12;
+    --rey-card: #12121c;
     --rey-border: rgba(255,255,255,.08);
-    --rey-text: #f8fafc;
-    --rey-muted: #94a3b8;
 }
 
-html,
 body {
     background:
         radial-gradient(
-            circle at 15% 0%,
-            rgba(139,92,246,.14),
-            transparent 30%
-        ),
-        radial-gradient(
-            circle at 100% 20%,
-            rgba(99,102,241,.12),
-            transparent 30%
+            circle at top right,
+            rgba(139,92,246,.12),
+            transparent 35%
         ),
         var(--rey-bg) !important;
-
-    color: var(--rey-text) !important;
 }
 
-aside,
-nav {
-    background:
-        rgba(10,10,16,.94) !important;
-
-    border-color:
-        var(--rey-border) !important;
-
-    backdrop-filter:
-        blur(18px);
-}
-
-.bg-gray-800,
-.bg-gray-900,
-.bg-neutral-800,
-.bg-neutral-900 {
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,.045),
-            rgba(255,255,255,.018)
-        ) !important;
-}
-
-input,
-textarea,
-select {
-    background:
-        rgba(255,255,255,.035) !important;
-
-    color:
-        var(--rey-text) !important;
-
-    border:
-        1px solid var(--rey-border) !important;
-
-    border-radius:
-        11px !important;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-    border-color:
-        var(--rey-primary) !important;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(139,92,246,.12) !important;
-
-    outline:
-        none !important;
-}
-
-button {
-    border-radius:
-        10px !important;
-}
-
-.bg-blue-500,
-.bg-primary-500 {
-    background:
-        linear-gradient(
-            135deg,
-            var(--rey-primary),
-            var(--rey-secondary)
-        ) !important;
-}
-
-a {
-    transition:
-        all .2s ease;
-}
-
-a:hover {
-    color:
-        #a78bfa !important;
-}
-
-.text-gray-300,
-.text-gray-400,
-.text-neutral-400,
-.text-neutral-500 {
-    color:
-        var(--rey-muted) !important;
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--rey-primary) transparent;
 }
 
 ::-webkit-scrollbar {
-    width:
-        7px;
-
-    height:
-        7px;
-}
-
-::-webkit-scrollbar-track {
-    background:
-        transparent;
+    width: 7px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background:
-        linear-gradient(
-            var(--rey-primary),
-            var(--rey-secondary)
-        );
-
-    border-radius:
-        20px;
+    background: linear-gradient(
+        var(--rey-primary),
+        var(--rey-secondary)
+    );
+    border-radius: 20px;
 }
 
-::selection {
-    background:
-        rgba(139,92,246,.35);
+a {
+    transition: .2s ease;
+}
+
+button,
+a,
+input {
+    transition: .2s ease;
+}
+
+.reycloud-theme {
+    font-family: Inter, system-ui, sans-serif;
+}
+
+.reycloud-brand {
+    font-weight: 800;
+    letter-spacing: -.4px;
+    background: linear-gradient(
+        90deg,
+        #a78bfa,
+        #6366f1
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.reycloud-card {
+    background: rgba(18,18,28,.82);
+    border: 1px solid var(--rey-border);
+    border-radius: 16px;
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.22);
+    backdrop-filter: blur(16px);
+}
+
+.reycloud-glow {
+    box-shadow:
+        0 0 0 1px rgba(139,92,246,.08),
+        0 15px 45px rgba(99,102,241,.12);
 }
 EOF
 
-    cat > "$THEME_DIR/theme.js" <<'EOF'
-(() => {
+echo "[5/7] Membuat JavaScript theme..."
+
+cat > "$THEME_DIR/theme.js" <<'EOF'
+(function () {
+
     "use strict";
 
-    const BRAND = "ReyCloud";
+    function applyReyCloudTheme() {
 
-    function loadTheme() {
-        if (
-            document.getElementById(
-                "reycloud-theme"
+        document.documentElement.classList.add(
+            "reycloud-theme"
+        );
+
+        document.body.classList.add(
+            "reycloud-theme"
+        );
+
+        document
+            .querySelectorAll(
+                ".login-container, .login-box, .card"
             )
-        ) {
-            return;
-        }
+            .forEach(function (element) {
 
-        const link =
-            document.createElement("link");
-
-        link.id =
-            "reycloud-theme";
-
-        link.rel =
-            "stylesheet";
-
-        link.href =
-            "/reycloud/theme.css";
-
-        document.head.appendChild(link);
-    }
-
-    function branding() {
-        document.documentElement
-            .setAttribute(
-                "data-reycloud",
-                "true"
-            );
-
-        if (document.title) {
-            document.title =
-                document.title.replace(
-                    /Pterodactyl/gi,
-                    BRAND
+                element.classList.add(
+                    "reycloud-card"
                 );
-        }
-    }
 
-    function init() {
-        loadTheme();
-        branding();
+            });
+
+        document
+            .querySelectorAll(
+                "h1, h2, h3"
+            )
+            .forEach(function (element) {
+
+                if (
+                    element.textContent
+                        .trim()
+                        .toLowerCase()
+                        .includes("rey")
+                ) {
+                    element.classList.add(
+                        "reycloud-brand"
+                    );
+                }
+
+            });
+
     }
 
     if (
-        document.readyState ===
-        "loading"
+        document.readyState === "loading"
     ) {
+
         document.addEventListener(
             "DOMContentLoaded",
-            init
+            applyReyCloudTheme
         );
+
     } else {
-        init();
+
+        applyReyCloudTheme();
+
     }
 
-    new MutationObserver(() => {
-        branding();
-    }).observe(
+    const observer =
+        new MutationObserver(function () {
+
+            applyReyCloudTheme();
+
+        });
+
+    observer.observe(
         document.documentElement,
         {
             childList: true,
             subtree: true
         }
     );
+
 })();
 EOF
 
-    success "Asset theme dibuat."
+echo "[6/7] Membuat loader..."
 
-    cd "$PTERO_DIR"
+cat > "$THEME_DIR/index.php" <<'EOF'
+<?php
+http_response_code(403);
+exit;
+EOF
 
-    info "Membersihkan Laravel cache..."
+echo "[7/7] Membersihkan cache..."
 
-    php artisan optimize:clear || true
+cd "$PANEL"
 
-    success "Cache dibersihkan."
+php artisan view:clear || true
+php artisan config:clear || true
+php artisan cache:clear || true
 
-    if command -v yarn >/dev/null 2>&1; then
-        info "Installing frontend dependencies..."
+chmod -R 755 "$THEME_DIR"
 
-        yarn install --frozen-lockfile \
-            || yarn install
+if command -v systemctl >/dev/null 2>&1; then
 
-        info "Building frontend..."
+    systemctl restart nginx 2>/dev/null || true
+    systemctl restart apache2 2>/dev/null || true
 
-        yarn build:production || {
-            warning "Frontend build gagal."
-            warning "Theme asset tetap tersimpan."
-        }
+fi
 
-        success "Proses build selesai."
-    else
-        warning "Yarn tidak ditemukan."
-    fi
+php artisan queue:restart 2>/dev/null || true
 
-    chown -R www-data:www-data \
-        "$PTERO_DIR/storage" \
-        "$PTERO_DIR/bootstrap/cache" \
-        2>/dev/null || true
-
-    chmod -R 755 "$THEME_DIR"
-
-    restart_services
-
-    echo ""
-    success "ReyCloud Theme berhasil dipasang."
-}
-
-update_theme() {
-    echo ""
-
-    if [ ! -d "$THEME_DIR" ]; then
-        warning "Theme belum terinstall."
-        install_theme
-        return
-    fi
-
-    backup
-
-    info "Memperbarui theme..."
-
-    install_theme
-
-    success "Theme berhasil diperbarui."
-}
-
-uninstall_theme() {
-    echo ""
-
-    if [ ! -d "$THEME_DIR" ]; then
-        warning "ReyCloud Theme tidak ditemukan."
-        return
-    fi
-
-    echo ""
-    warning "Theme akan dihapus."
-    echo ""
-
-    read -r -p "Lanjutkan? [y/N]: " answer
-
-    if [[ "$answer" != "y" &&
-          "$answer" != "Y" ]]; then
-        info "Dibatalkan."
-        return
-    fi
-
-    backup
-
-    rm -rf "$THEME_DIR"
-
-    cd "$PTERO_DIR"
-
-    php artisan optimize:clear || true
-
-    if command -v yarn >/dev/null 2>&1; then
-        yarn build:production || true
-    fi
-
-    restart_services
-
-    success "ReyCloud Theme dihapus."
-}
-
-restore_backup() {
-    echo ""
-
-    if [ ! -d "$BACKUP_DIR" ]; then
-        error "Folder backup tidak ditemukan."
-        return
-    fi
-
-    local latest
-
-    latest=$(ls -t "$BACKUP_DIR"/*.tar.gz 2>/dev/null | head -n 1)
-
-    if [ -z "$latest" ]; then
-        error "Backup tidak ditemukan."
-        return
-    fi
-
-    echo ""
-    echo "Backup terbaru:"
-    echo "$latest"
-    echo ""
-
-    read -r -p "Restore backup ini? [y/N]: " answer
-
-    if [[ "$answer" != "y" &&
-          "$answer" != "Y" ]]; then
-        info "Dibatalkan."
-        return
-    fi
-
-    info "Restore backup..."
-
-    tar -xzf "$latest" \
-        -C "$PTERO_DIR"
-
-    rm -rf "$THEME_DIR"
-
-    cd "$PTERO_DIR"
-
-    php artisan optimize:clear || true
-
-    if command -v yarn >/dev/null 2>&1; then
-        yarn build:production || true
-    fi
-
-    restart_services
-
-    success "Backup berhasil direstore."
-}
-
-rebuild_panel() {
-    echo ""
-
-    cd "$PTERO_DIR"
-
-    info "Membersihkan cache..."
-
-    php artisan optimize:clear || true
-
-    if command -v yarn >/dev/null 2>&1; then
-        info "Building frontend..."
-
-        yarn build:production
-    else
-        warning "Yarn tidak tersedia."
-    fi
-
-    restart_services
-
-    success "Panel berhasil direbuild."
-}
-
-restart_services() {
-    info "Restart service..."
-
-    systemctl restart nginx \
-        2>/dev/null || true
-
-    systemctl restart php8.3-fpm \
-        2>/dev/null || true
-
-    systemctl restart php8.2-fpm \
-        2>/dev/null || true
-
-    success "Service selesai direstart."
-}
-
-menu() {
-    while true; do
-
-        clear
-        banner
-
-        echo "1. Install Theme"
-        echo "2. Update Theme"
-        echo "3. Uninstall Theme"
-        echo "4. Restore Backup"
-        echo "5. Rebuild Panel"
-        echo "6. Restart Service"
-        echo "0. Exit"
-        echo ""
-
-        read -r -p "Pilih menu: " choice
-
-        case "$choice" in
-
-            1)
-                check_pterodactyl
-                install_theme
-                ;;
-
-            2)
-                check_pterodactyl
-                update_theme
-                ;;
-
-            3)
-                check_pterodactyl
-                uninstall_theme
-                ;;
-
-            4)
-                check_pterodactyl
-                restore_backup
-                ;;
-
-            5)
-                check_pterodactyl
-                rebuild_panel
-                ;;
-
-            6)
-                restart_services
-                ;;
-
-            0)
-                echo ""
-                info "Bye 👋"
-                exit 0
-                ;;
-
-            *)
-                error "Pilihan tidak valid."
-                ;;
-        esac
-
-        echo ""
-        read -r -p "Tekan ENTER untuk kembali..."
-    done
-}
-
-check_root
-menu
+echo ""
+echo "=========================================="
+echo "       REYCLOUD THEME BERHASIL DIPASANG"
+echo "=========================================="
+echo ""
+echo "Panel    : $PANEL"
+echo "Version  : $VERSION"
+echo "Backup   : $BACKUP_FILE"
+echo ""
+echo "Silakan refresh browser."
+echo ""
